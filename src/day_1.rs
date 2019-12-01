@@ -5,6 +5,7 @@ use std::ops::{Div, Sub};
 
 type MySimd = i32x8;
 
+#[test]
 pub fn run() {
     let input = read_input(include_str!("input/day1.txt"));
     println!("{}", exercise_1(&input));
@@ -37,10 +38,12 @@ pub fn exercise_2(slice: &Vec<i32>) -> i32 {
 
 fn calculate_fuel_simd(mass: MySimd) -> MySimd {
     let zero: MySimd = MySimd::splat(0);
+    let three: MySimd = MySimd::splat(3);
+    let two: MySimd = MySimd::splat(2);
     let mut fuel = mass;
     let mut sum = zero;
     while {
-        fuel = (fuel / 3 - 2).max(zero);
+        fuel = (fuel / three - two).max(zero);
         fuel.gt(zero).any()
     } {
         sum += fuel;
@@ -72,6 +75,10 @@ fn d1_test() {
     assert_eq!(exercise_2(&vec!(12)), 2);
     assert_eq!(exercise_2(&vec!(1969)), 966);
     assert_eq!(exercise_2(&vec!(100756)), 50346);
+
+    let input = read_input(include_str!("input/day1.txt"));
+    assert_eq!(3268951, exercise_1(&input));
+    assert_eq!(4900568, exercise_2(&input));
 }
 
 

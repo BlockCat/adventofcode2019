@@ -76,6 +76,11 @@ fn d1_test() {
     assert_eq!(exercise_2(&vec!(100756)), 50346);
 }
 
+
+#[bench]
+fn d1_bench_parse(b: &mut Bencher) {    
+    b.iter(|| read_input(include_str!("input/day1.txt")));
+}
 #[bench]
 fn d1_bench_ex1(b: &mut Bencher) {
     let input = read_input(include_str!("input/day1.txt"));

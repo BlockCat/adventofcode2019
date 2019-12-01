@@ -15,8 +15,7 @@ pub fn exercise_1(slice: &Vec<i32>) -> i32 {
     let mut iter = slice.chunks_exact(MySimd::lanes());
     let simd = iter
         .by_ref()
-        .map(MySimd::from_slice_unaligned)
-        .map(|x| x / 3 - 2)
+        .map(|x| MySimd::from_slice_unaligned(x) / 3 - 2)
         .sum::<MySimd>()
         .wrapping_sum();
 
@@ -28,8 +27,7 @@ pub fn exercise_2(slice: &Vec<i32>) -> i32 {
     let mut iter = slice.chunks_exact(MySimd::lanes());
     let simd = iter
         .by_ref()
-        .map(MySimd::from_slice_unaligned)
-        .map(calculate_fuel_simd)
+        .map(|x| calculate_fuel_simd(MySimd::from_slice_unaligned(x)))
         .sum::<MySimd>()
         .wrapping_sum();
 

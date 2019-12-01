@@ -3,12 +3,11 @@ name = "aoc2019"
 version = "0.1.0"
 authors = ["BlockCat <zinoonomiwo@gmail.com>"]
 edition = "2018"
-rustflags = ["-C target-cpu=native"]
 
 [dependencies]
 itertools = "0.8.2"
 hashbrown = "0.6.3"
-bitvec = "0.16.0"
+packed_simd = "0.3.3"
 
 [lib]
 name = "utils"

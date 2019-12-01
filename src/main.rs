@@ -2,18 +2,10 @@
 extern crate hashbrown;
 extern crate test;
 extern crate utils;
+extern crate packed_simd;
 
-macro_rules! run {
-    ($($x:ident), *) => {
-        $(
-            #[allow(dead_code)]
-            mod $x;
-        )*
-        
-        fn main() {
-            
-        }
-    }
+mod day_1;
+
+fn main() {    
+    day_1::run();
 }
-
-run!(day_1);

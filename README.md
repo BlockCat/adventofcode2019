@@ -7,6 +7,6 @@ Advent of code 2019
 
 Day 1
 ```rust
-test day1::d1_bench_ex1 ... bench:          70 ns/iter (+/- 1)
-test day1::d1_bench_ex2 ... bench:       1,648 ns/iter (+/- 35)
+test day1::d1_bench_ex1 ... bench:          69 ns/iter (+/- 4)
+test day1::d1_bench_ex2 ... bench:         996 ns/iter (+/- 62)
 ```

@@ -9,18 +9,21 @@ pub fn run() {
     println!("{}", exercise_2(input.clone()));
 }
 
-pub fn exercise_1(mut slice: Vec<i32>) -> i32 {    
+pub fn exercise_1(slice: Vec<i32>) -> i32 {    
     run_program(12, 2, slice)
 }
 
 pub fn exercise_2(slice: Vec<i32>) -> i32 {
-    let target = 19690720;
+    let target = 19690720i32;
     
-    let diff = run_program(2, 0, slice.clone()) - run_program(1, 0, slice.clone());
-    let noun = target / diff - 1;
+    let offset = run_program(0, 0, slice.clone());
+    let diff = run_program(1, 0, slice.clone()) - offset;
+    let noun = (target - offset) / diff;
+
     let r = run_program(noun, 0, slice.clone());
     let verb = (target - r) / (run_program(noun, 1, slice.clone()) - r);
 
+    assert_eq!(run_program(noun, verb, slice.clone()), target);
     noun * 100 + verb
 }
 
@@ -28,7 +31,7 @@ pub fn exercise_2(slice: Vec<i32>) -> i32 {
 fn run_program(noun: i32, verb: i32, mut slice: Vec<i32>) -> i32 {
     slice[1] = noun;
     slice[2] = verb;
-    for i in (0..slice.len()).step_by(4) {        
+    for i in (0..slice.len()).step_by(4) {
         match slice[i] {
             1 => {
                 let index = slice[i+3] as usize;

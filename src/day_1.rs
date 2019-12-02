@@ -1,7 +1,6 @@
 use crate::test::Bencher;
 
 use packed_simd::*;
-use std::ops::{Div, Sub};
 
 type MySimd = i32x8;
 
@@ -38,25 +37,22 @@ pub fn exercise_2(slice: &Vec<i32>) -> i32 {
 
 fn calculate_fuel_simd(mass: MySimd) -> MySimd {
     let zero: MySimd = MySimd::splat(0);
+    let nine: MySimd = MySimd::splat(9);
     let three: MySimd = MySimd::splat(3);
     let two: MySimd = MySimd::splat(2);
     let mut fuel = mass;
     let mut sum = zero;
-    while {
+    while fuel.gt(nine).any() {
         fuel = (fuel / three - two).max(zero);
-        fuel.gt(zero).any()
-    } {
         sum += fuel;
     }
     sum
-}
+} 
 fn calculate_fuel(mass: &i32) -> i32 {
     let mut fuel = *mass;
     let mut sum = 0;
-    while {
+    while fuel >= 9 {
         fuel = fuel / 3 - 2;
-        fuel > 0
-    } {
         sum += fuel;
     }
     sum

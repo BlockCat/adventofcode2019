@@ -21,7 +21,7 @@ test day_2::d2_bench_parse ... bench:       4,004 ns/iter (+/- 144)
 ```
 Day 3
 ```rust
-test day_3::d2_bench_ex1   ... bench:   8,477,215 ns/iter (+/- 500,915)
-test day_3::d2_bench_ex2   ... bench:  10,893,040 ns/iter (+/- 643,282)
-test day_3::d2_bench_parse ... bench:      17,340 ns/iter (+/- 370)
+test day_3::d2_bench_ex1   ... bench:   8,555,205 ns/iter (+/- 911,067)
+test day_3::d2_bench_ex2   ... bench:  11,091,770 ns/iter (+/- 1,326,304)
+test day_3::d2_bench_parse ... bench:      17,679 ns/iter (+/- 353)
 ```

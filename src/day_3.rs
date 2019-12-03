@@ -42,51 +42,37 @@ impl Iterator for WireInstruction {
     }
 }
 
-#[test]
 pub fn run() {
-    let mut input = read_input(include_str!("input/day3.txt"));
+    let mut input = read_input(include_str!("input/day3_big.txt"));
     println!("{}", exercise_1(input.clone()));
     println!("{}", exercise_2(input.clone()));
 }
 
 fn exercise_1((wire_1, wire_2): (WireInstruction, WireInstruction)) -> usize {
-    let mut grid = hashbrown::HashSet::new();
-    let mut closest_distance = std::usize::MAX;
+    let grid = wire_1.collect::<hashbrown::HashSet<_>>();
 
-    let origin = Vector2(0, 0);
-
-    for pos_1 in wire_1 {
-        grid.insert(pos_1);
-    }
+    let mut closest_distance = std::isize::MAX;
 
     for pos_2 in wire_2 {
-        if Vector2::manhattan(&pos_2, &origin) < closest_distance && grid.contains(&pos_2) {
-            closest_distance = Vector2::manhattan(&pos_2, &origin);
+        if pos_2.0.abs() + pos_2.1.abs() < closest_distance && grid.contains(&pos_2) {
+            closest_distance = pos_2.0.abs() + pos_2.1.abs();
         }
     }
 
-    closest_distance
+    closest_distance as usize
 }
 
 fn exercise_2((wire_1, wire_2): (WireInstruction, WireInstruction)) -> usize {
-    let mut grid = hashbrown::HashMap::new();
+    let grid = wire_1
+        .zip(0..)
+        .collect::<hashbrown::HashMap<Vector2, usize>>();
 
-    let mut closest_distance = std::usize::MAX;
-    let origin = Vector2(0, 0);
-
-    for (index, pos_1) in wire_1.enumerate() {
-        grid.entry(pos_1).or_insert(index + 1);
-    }
-
-    for (index, pos_2) in wire_2.enumerate() {
-        if let Some(steps_o_1) = grid.get(&pos_2) {
-            if steps_o_1 + index + 1 < closest_distance {
-                closest_distance = steps_o_1 + index + 1;
-            }
-        }
-    }
-
-    closest_distance
+    wire_2
+        .enumerate()
+        .filter_map(|(i, f)| grid.get(&f).map(|x| x + i))
+        .min()
+        .unwrap()
+        + 2
 }
 
 fn read_input(input: &str) -> (WireInstruction, WireInstruction) {

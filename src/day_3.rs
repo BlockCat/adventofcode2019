@@ -50,19 +50,17 @@ pub fn run() {
 }
 
 fn exercise_1((wire_1, wire_2): (WireInstruction, WireInstruction)) -> usize {
-    let mut grid = InfiniteGrid::new();
+    let mut grid = hashbrown::HashSet::new();
     let mut closest_distance = std::usize::MAX;
 
     let origin = Vector2(0, 0);
 
     for pos_1 in wire_1 {
-        grid.set(pos_1.0, pos_1.1, true);
+        grid.insert(pos_1);
     }
 
     for pos_2 in wire_2 {
-        if Vector2::manhattan(&pos_2, &origin) < closest_distance
-            && grid.get(pos_2.0, pos_2.1) == Some(&true)
-        {
+        if Vector2::manhattan(&pos_2, &origin) < closest_distance && grid.contains(&pos_2) {
             closest_distance = Vector2::manhattan(&pos_2, &origin);
         }
     }
@@ -71,20 +69,17 @@ fn exercise_1((wire_1, wire_2): (WireInstruction, WireInstruction)) -> usize {
 }
 
 fn exercise_2((wire_1, wire_2): (WireInstruction, WireInstruction)) -> usize {
-    let mut grid = InfiniteGrid::new();
+    let mut grid = hashbrown::HashMap::new();
 
     let mut closest_distance = std::usize::MAX;
     let origin = Vector2(0, 0);
 
     for (index, pos_1) in wire_1.enumerate() {
-        if let Some((_, false)) = grid.get(pos_1.0, pos_1.1){
-            grid.set(pos_1.0, pos_1.1, (index + 1, true));
-        }
+        grid.entry(pos_1).or_insert(index + 1);
     }
 
     for (index, pos_2) in wire_2.enumerate() {
-        let result = grid.get(pos_2.0, pos_2.1);        
-        if let Some(&(steps_o_1, true)) = result {
+        if let Some(steps_o_1) = grid.get(&pos_2) {
             if steps_o_1 + index + 1 < closest_distance {
                 closest_distance = steps_o_1 + index + 1;
             }
@@ -133,9 +128,11 @@ U62,R66,U55,R34,D71,R55,D58,R83";
 U98,R91,D20,R16,D67,R40,U7,R15,U6,R7";
     assert_eq!(exercise_1(read_input(input)), 135);
     assert_eq!(exercise_2(read_input(input)), 410);
-    
     assert_eq!(exercise_1(read_input(include_str!("input/day3.txt"))), 293);
-    assert_eq!(exercise_2(read_input(include_str!("input/day3.txt"))), 27306);
+    assert_eq!(
+        exercise_2(read_input(include_str!("input/day3.txt"))),
+        27306
+    );
 }
 
 #[bench]
@@ -153,4 +150,3 @@ fn d2_bench_ex2(b: &mut Bencher) {
     let input = read_input(include_str!("input/day3.txt"));
     b.iter(|| exercise_2(input.clone()));
 }
-

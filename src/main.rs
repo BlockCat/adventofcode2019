@@ -4,8 +4,8 @@ extern crate test;
 extern crate utils;
 extern crate packed_simd;
 
-mod day_3;
+mod day_4;
 
 fn main() {    
-    day_3::run();
+    day_4::run();
 }

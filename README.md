@@ -21,7 +21,12 @@ test day_2::d2_bench_parse ... bench:       4,004 ns/iter (+/- 144)
 ```
 Day 3
 ```rust
-test day_3::d2_bench_ex1   ... bench:   8,555,205 ns/iter (+/- 911,067)
-test day_3::d2_bench_ex2   ... bench:  11,091,770 ns/iter (+/- 1,326,304)
-test day_3::d2_bench_parse ... bench:      17,679 ns/iter (+/- 353)
+test day_3::d3_bench_ex1   ... bench:   8,555,205 ns/iter (+/- 911,067)
+test day_3::d3_bench_ex2   ... bench:  11,091,770 ns/iter (+/- 1,326,304)
+test day_3::d3_bench_parse ... bench:      17,679 ns/iter (+/- 353)
+```
+Day 4
+```rust
+test day_4::d4_bench_ex1 ... bench:   1,349,610 ns/iter (+/- 170,474)
+test day_4::d4_bench_ex2 ... bench:   1,421,690 ns/iter (+/- 10,577)
 ```

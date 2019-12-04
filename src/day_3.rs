@@ -49,6 +49,7 @@ pub fn run() {
 }
 
 fn exercise_1((wire_1, wire_2): (WireInstruction, WireInstruction)) -> usize {
+    
     let grid = wire_1.collect::<hashbrown::HashSet<_>>();
 
     let mut closest_distance = std::isize::MAX;
@@ -63,16 +64,15 @@ fn exercise_1((wire_1, wire_2): (WireInstruction, WireInstruction)) -> usize {
 }
 
 fn exercise_2((wire_1, wire_2): (WireInstruction, WireInstruction)) -> usize {
-    let grid = wire_1
-        .zip(0..)
-        .collect::<hashbrown::HashMap<Vector2, usize>>();
+    let grid = wire_1.zip(0..).collect::<hashbrown::HashMap<Vector2, usize>>();
 
-    wire_2
-        .enumerate()
-        .filter_map(|(i, f)| grid.get(&f).map(|x| x + i))
-        .min()
-        .unwrap()
-        + 2
+    let mut closest_distance = std::usize::MAX;
+
+    wire_2.enumerate()
+        .filter_map(|(i, f)| grid.get(f).map(|x| x + i))
+        .min() + 2
+
+    closest_distance + 2
 }
 
 fn read_input(input: &str) -> (WireInstruction, WireInstruction) {
@@ -122,17 +122,17 @@ U98,R91,D20,R16,D67,R40,U7,R15,U6,R7";
 }
 
 #[bench]
-fn d2_bench_parse(b: &mut Bencher) {
+fn d3_bench_parse(b: &mut Bencher) {
     b.iter(|| read_input(include_str!("input/day3.txt")));
 }
 #[bench]
-fn d2_bench_ex1(b: &mut Bencher) {
+fn d3_bench_ex1(b: &mut Bencher) {
     let input = read_input(include_str!("input/day3.txt"));
     b.iter(|| exercise_1(input.clone()));
 }
 
 #[bench]
-fn d2_bench_ex2(b: &mut Bencher) {
+fn d3_bench_ex2(b: &mut Bencher) {
     let input = read_input(include_str!("input/day3.txt"));
     b.iter(|| exercise_2(input.clone()));
 }

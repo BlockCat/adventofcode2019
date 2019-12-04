@@ -7,11 +7,51 @@ pub fn run() {
 }
 
 fn exercise_1(min: usize, max: usize) -> usize {
-    (min..=max).filter(is_valid).count()
+    let mut count = 0;
+    for a1 in 1..10 {
+        for a2 in a1..10 {
+            for a3 in a2..10 {
+                for a4 in a3..10 {
+                    for a5 in a4..10 {
+                        for a6 in a5..10 {
+                            let num = a1 * 100_000 + a2 * 10_000 + a3 * 1_000 + a4 * 100 + a5 * 10 + a6;
+                            if num > max {
+                                return count;
+                            }
+                            if num > min && is_valid(&num) {
+                                count += 1;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    count
 }
 
 fn exercise_2(min: usize, max: usize) -> usize {
-    (min..=max).filter(is_valid_2).count()
+    let mut count = 0;
+    for a1 in 1..10 {
+        for a2 in a1..10 {
+            for a3 in a2..10 {
+                for a4 in a3..10 {
+                    for a5 in a4..10 {
+                        for a6 in a5..10 {
+                            let num = a1 * 100_000 + a2 * 10_000 + a3 * 1_000 + a4 * 100 + a5 * 10 + a6;
+                            if num > max {
+                                return count;
+                            }
+                            if num > min && is_valid_2(&num) {
+                                count += 1;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    count
 }
 
 fn is_valid(pass: &usize) -> bool {
@@ -21,9 +61,7 @@ fn is_valid(pass: &usize) -> bool {
     let mut double = false;
     for i in 0..6 {
         let c = pass % 10;
-        if c > last {
-            return false;
-        } else if c == last {
+        if c == last {
             double = true;
         }
         last = c;
@@ -40,9 +78,7 @@ fn is_valid_2(opass: &usize) -> bool {
     let mut double = false;
     for _ in 0..6 {
         let c = pass % 10;
-        if c > last { // 1234(5)0
-            return false;
-        } else if c == last {   //1234(5)5          
+        if c == last {   //1234(5)5          
             match_count += 1;            
         } else { // c < last
             if match_count == 2 {                
@@ -65,6 +101,7 @@ fn d4_test() {
     assert_eq!(is_valid(&111111), true);
     assert_eq!(is_valid(&223450), false);
     assert_eq!(is_valid(&123789), false);
+    
 
     assert_eq!(is_valid_2(&112233), true);
     assert_eq!(is_valid_2(&123444), false);

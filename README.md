@@ -30,3 +30,9 @@ Day 4
 test day_4::d4_bench_ex1 ... bench:      17,822 ns/iter (+/- 3,861)
 test day_4::d4_bench_ex2 ... bench:      21,513 ns/iter (+/- 221)
 ```
+Day 5
+```rust
+test day_5::d5_bench_ex1   ... bench:         503 ns/iter (+/- 22)
+test day_5::d5_bench_ex2   ... bench:         800 ns/iter (+/- 103)
+test day_5::d5_bench_parse ... bench:      15,740 ns/iter (+/- 1,640)
+```

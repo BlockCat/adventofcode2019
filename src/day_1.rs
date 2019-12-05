@@ -41,7 +41,8 @@ fn calculate_fuel_simd(mass: MySimd) -> MySimd {
     let three: MySimd = MySimd::splat(3);
     let two: MySimd = MySimd::splat(2);
     let mut fuel = mass;
-    let mut sum = zero;
+    let mut sum = zero;    
+    
     while fuel.gt(nine).any() {
         fuel = (fuel / three - two).max(zero);
         sum += fuel;

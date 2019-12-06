@@ -19,7 +19,7 @@ fn exercise_1(input: Vec<Input>) -> Output {
     run_program(input, std::iter::once(1))
 }
 
-fn exercise_2(input: Vec<Input>) -> Output {    
+fn exercise_2(input: Vec<Input>) -> Output {
     run_program(input, std::iter::once(5))
 }
 
@@ -31,10 +31,9 @@ fn read_input(input: &str) -> Vec<Input> {
 }
 
 fn to_mode(mode: i32) -> ParamMode {
-    if mode == 0 {
-        ParamMode::Position
-    } else {
-        ParamMode::Immediate
+    match mode {
+        0 => ParamMode::Position,
+        _ => ParamMode::Immediate
     }
 }
 
@@ -76,8 +75,7 @@ fn run_program(mut slice: Vec<Input>, mut inputs: impl Iterator<Item = i32>) -> 
                 i += 2;
             }
             4 => {
-                let index = get_value(mode_1, &slice, i + 1); // Might need to be immediate mode
-                //println!("Output: {}", index);
+                let index = get_value(mode_1, &slice, i + 1);                                                              
                 latest_output = index;
                 i += 2;
             }
@@ -130,12 +128,23 @@ fn run_program(mut slice: Vec<Input>, mut inputs: impl Iterator<Item = i32>) -> 
 }
 
 #[test]
-fn d5_test() 
-{
-    assert_eq!(0, run_program(read_input("3,9,8,9,10,9,4,9,99,-1,8"), std::iter::once(9)));
-    assert_eq!(1, run_program(read_input("3,9,8,9,10,9,4,9,99,-1,8"), std::iter::once(8)));
-    assert_eq!(0, run_program(read_input("3,9,7,9,10,9,4,9,99,-1,8"), std::iter::once(9)));
-    assert_eq!(1, run_program(read_input("3,9,7,9,10,9,4,9,99,-1,8"), std::iter::once(7)));
+fn d5_test() {
+    assert_eq!(
+        0,
+        run_program(read_input("3,9,8,9,10,9,4,9,99,-1,8"), std::iter::once(9))
+    );
+    assert_eq!(
+        1,
+        run_program(read_input("3,9,8,9,10,9,4,9,99,-1,8"), std::iter::once(8))
+    );
+    assert_eq!(
+        0,
+        run_program(read_input("3,9,7,9,10,9,4,9,99,-1,8"), std::iter::once(9))
+    );
+    assert_eq!(
+        1,
+        run_program(read_input("3,9,7,9,10,9,4,9,99,-1,8"), std::iter::once(7))
+    );
     assert_eq!(999, run_program(read_input("3,21,1008,21,8,20,1005,20,22,107,8,21,20,1006,20,31,1106,0,36,98,0,0,1002,21,125,20,4,20,1105,1,46,104,999,1105,1,46,1101,1000,1,20,4,20,1105,1,46,98,99"), std::iter::once(7)));
     assert_eq!(1000, run_program(read_input("3,21,1008,21,8,20,1005,20,22,107,8,21,20,1006,20,31,1106,0,36,98,0,0,1002,21,125,20,4,20,1105,1,46,104,999,1105,1,46,1101,1000,1,20,4,20,1105,1,46,98,99"), std::iter::once(8)));
     assert_eq!(1001, run_program(read_input("3,21,1008,21,8,20,1005,20,22,107,8,21,20,1006,20,31,1106,0,36,98,0,0,1002,21,125,20,4,20,1105,1,46,104,999,1105,1,46,1101,1000,1,20,4,20,1105,1,46,98,99"), std::iter::once(9)));
@@ -159,6 +168,5 @@ fn d5_bench_ex2(b: &mut Bencher) {
 
 #[bench]
 fn d5_bench_parse(b: &mut Bencher) {
-    
     b.iter(|| read_input(include_str!("input/day5.txt")));
 }

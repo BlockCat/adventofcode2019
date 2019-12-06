@@ -36,3 +36,7 @@ test day_5::d5_bench_ex1   ... bench:         503 ns/iter (+/- 22)
 test day_5::d5_bench_ex2   ... bench:         800 ns/iter (+/- 103)
 test day_5::d5_bench_parse ... bench:      15,740 ns/iter (+/- 1,640)
 ```
+Day 6
+test day_6::d6_bench_ex1   ... bench:     102,908 ns/iter (+/- 2,643)
+test day_6::d6_bench_ex2   ... bench:     136,178 ns/iter (+/- 4,078)
+test day_6::d6_bench_parse ... bench:     240,925 ns/iter (+/- 10,149)

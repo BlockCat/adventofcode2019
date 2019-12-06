@@ -9,7 +9,7 @@ type Output = usize;
 #[derive(Clone)]
 struct TreeNode {
     pub parent: usize,
-    pub children: Vec<usize>
+    pub children: Vec<usize>,
 }
 
 #[derive(Clone)]
@@ -33,8 +33,10 @@ pub fn run() {
     println!("ex2: {}", exercise_2(input));
 }
 
-fn exercise_1(input: Input) -> Output {
-    let mut queue = vec![(0, "COM")];
+fn exercise_1(input: Tree) -> Output {
+    let mut queue = Vec::with_capacity(input.parents.len());    
+    queue.push((0, "COM"));
+
     let mut sum = 0usize;
     while let Some((d, node)) = queue.pop() {
         sum += d;
@@ -46,29 +48,16 @@ fn exercise_1(input: Input) -> Output {
     }
 
     sum
+    
 }
 
-fn exercise_2(input: Input) -> Output {
-    let mut queue = vec![(0, "YOU")];
-    let mut visited = HashSet::new();
-    while let Some((d, node)) = queue.pop() {
-        if visited.contains(&node) {
-            continue;
-        }
-        visited.insert(node.clone());
-        if node == "SAN" {
-            return d - 2;
-        }
-        if let Some(parent) = input.parents.get(&node) {
-            queue.push((d + 1, parent));
-        }
-        if let Some(children) = input.nodes.get(&node) {
-            for k in children.iter().map(|c| (d + 1, *c)) {
-                queue.push(k);
-            }
-        }
-    }
-    unreachable!()
+
+fn exercise_2(input: Tree) -> Output {
+    let san =
+        std::iter::successors(Some(&"YOU"), |&x| input.parents.get(x)).collect::<HashSet<_>>();
+    let you =
+        std::iter::successors(Some(&"SAN"), |&x| input.parents.get(x)).collect::<HashSet<_>>();
+    san.symmetric_difference(&you).count() - 2
 }
 
 fn read_input<'a>(input: &'a str) -> Input<'a> {
@@ -122,8 +111,10 @@ K)L
 K)YOU
 I)SAN";
     assert_eq!(exercise_2(read_input(test)), 4);
-
-    assert_eq!(exercise_1(read_input(include_str!("input/day6.txt"))), 130681);
+    assert_eq!(
+        exercise_1(read_input(include_str!("input/day6.txt"))),
+        130681
+    );
     assert_eq!(exercise_2(read_input(include_str!("input/day6.txt"))), 313);
 }
 

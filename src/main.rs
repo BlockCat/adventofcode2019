@@ -4,9 +4,9 @@ extern crate test;
 extern crate utils;
 extern crate packed_simd;
 
-mod day_7;
-
 #[allow(dead_code)]
+mod day_8;
+
 fn main() {    
     //day_5::run();
 }

@@ -51,7 +51,7 @@ fn exercise_2(input: Vec<Input>) -> Output {
         let b_mem = input.clone();
         let c_mem = input.clone();
         let d_mem = input.clone();
-        let e_mem = input.clone();
+        let e_mem = input.clone();   
 
         let (ase, are): (Sender<Input>, Receiver<Input>) = mpsc::channel();
         let (bse, bre): (Sender<Input>, Receiver<Input>) = mpsc::channel();

@@ -20,7 +20,7 @@ fn exercise_2(input: intcode::Memory) -> i64 {
 
 #[test]
 fn d7_test() {
-    use intcode::*;  
+    use intcode::*;
     let input = parse_program("104,1125899906842624,99");
     assert_eq!(
         run_program_channel(input, std::iter::empty(), intcode::NoOutput),

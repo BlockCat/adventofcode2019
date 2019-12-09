@@ -54,3 +54,9 @@ test day_8::d8_bench_ex1   ... bench:      74,860 ns/iter (+/- 3,540)
 test day_8::d8_bench_ex2   ... bench:      22,269 ns/iter (+/- 1,066)
 test day_8::d8_bench_parse ... bench:      15,871 ns/iter (+/- 679)       
 ```
+Day 9
+```rust
+test day_9::d9_bench_ex1   ... bench:       4,944 ns/iter (+/- 55)
+test day_9::d9_bench_ex2   ... bench:   6,120,800 ns/iter (+/- 219,399)
+test day_9::d9_bench_parse ... bench:      24,480 ns/iter (+/- 702)
+```

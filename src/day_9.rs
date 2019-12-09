@@ -1,7 +1,4 @@
 use crate::test::Bencher;
-use permutohedron::Heap;
-use std::sync::mpsc;
-use std::sync::mpsc::Sender;
 
 #[test]
 pub fn run() {
@@ -11,11 +8,11 @@ pub fn run() {
 }
 
 fn exercise_1(input: intcode::Memory) -> i64 {
-    intcode::run_program_channel(input, std::iter::once(1), intcode::NoOutput)
+    intcode::run_program_channel(input, std::iter::once(1), &mut intcode::NoOutput)
 }
 
 fn exercise_2(input: intcode::Memory) -> i64 {
-    intcode::run_program_channel(input, std::iter::once(2), intcode::NoOutput)
+    intcode::run_program_channel(input, std::iter::once(2), &mut intcode::NoOutput)
 }
 
 #[test]
@@ -23,39 +20,42 @@ fn d7_test() {
     use intcode::*;
     let input = parse_program("104,1125899906842624,99");
     assert_eq!(
-        run_program_channel(input, std::iter::empty(), intcode::NoOutput),
+        run_program_channel(input, std::iter::empty(), &mut intcode::NoOutput),
         1125899906842624
     );
 
     let input = parse_program("1102,34915192,34915192,7,4,7,99,0");
     assert_eq!(
-        run_program_channel(input, std::iter::empty(), intcode::NoOutput),
+        run_program_channel(input, std::iter::empty(), &mut intcode::NoOutput),
         34915192 * 34915192
     );
 
     let input = parse_program("109,1,204,-1,1001,100,1,100,1008,100,16,101,1006,101,0,99");
-    assert_eq!(
-        run_program_channel(input, std::iter::empty(), intcode::PrintOutput),
-        99
-    );
+    let mut buf = Vec::new();
+    run_program_channel(input, std::iter::empty(), &mut buf); 
+    assert_eq!(buf, vec![109,1,204,-1,1001,100,1,100,1008,100,16,101,1006,101,0,99]);
+
+    let input = parse_program(include_str!("input/day9.txt"));
+    assert_eq!(exercise_1(input.clone()), 3512778005);
+    assert_eq!(exercise_2(input.clone()), 35920);
 }
-/*
+
 #[bench]
-fn d7_bench_ex1(b: &mut Bencher) {
-    let input = intcode::parse_program(include_str!("input/day7.txt"));
+fn d9_bench_ex1(b: &mut Bencher) {
+    let input = intcode::parse_program(include_str!("input/day9.txt"));
     b.iter(|| exercise_1(input.clone()));
 }
 
 #[bench]
-fn d7_bench_ex2(b: &mut Bencher) {
-    let input = intcode::parse_program(include_str!("input/day7.txt"));
+fn d9_bench_ex2(b: &mut Bencher) {
+    let input = intcode::parse_program(include_str!("input/day9.txt"));
     b.iter(|| exercise_2(input.clone()));
 }
 
 #[bench]
-fn d7_bench_parse(b: &mut Bencher) {
-    b.iter(|| intcode::parse_program(include_str!("input/day7.txt")));
-}*/
+fn d9_bench_parse(b: &mut Bencher) {
+    b.iter(|| intcode::parse_program(include_str!("input/day9.txt")));
+}
 
 mod intcode {
 
@@ -69,25 +69,31 @@ mod intcode {
     pub struct NoOutput;
     pub struct PrintOutput;
     pub trait Out<T> {
-        fn output(&self, n: T);
+        fn output(&mut self, n: T);
     }
 
     impl<T> Out<T> for NoOutput {
-        fn output(&self, _: T) {}
+        fn output(&mut self, _: T) {}
     }
 
     impl<T> Out<T> for PrintOutput
     where
         T: std::fmt::Display,
     {
-        fn output(&self, n: T) {
+        fn output(&mut self, n: T) {
             println!(">{}", n);
         }
     }
 
     impl<T> Out<T> for std::sync::mpsc::Sender<T> {
-        fn output(&self, n: T) {
+        fn output(&mut self, n: T) {
             self.send(n).unwrap_or(())
+        }
+    }
+
+    impl<T> Out<T> for Vec<T> {
+        fn output(&mut self, n: T) {
+            self.push(n);
         }
     }
 
@@ -157,7 +163,7 @@ mod intcode {
     pub fn run_program_channel(
         mut slice: Memory,
         mut receiver: impl Iterator<Item = i64>,
-        sender: impl Out<i64>,
+        sender: &mut impl Out<i64>,
     ) -> i64 {
         let mut i = 0;
         let mut latest_output = -1;
@@ -167,12 +173,7 @@ mod intcode {
             let opcode = instruction % 100;
             let mode_1 = to_mode((instruction / 100) % 10);
             let mode_2 = to_mode((instruction / 1_000) % 10);
-            let mode_3 = match (instruction / 10_000) % 10 {
-                0 => ParamMode::Immediate,
-                1 => panic!(),
-                2 => ParamMode::Relative,
-                _ => panic!(),
-            };
+            let mode_3 = to_mode((instruction / 10_000) % 10);
 
             //println!("{} - {:?}", opcode, slice);
             match opcode {

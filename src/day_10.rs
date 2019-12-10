@@ -50,36 +50,46 @@ fn exercise_1(grid: Grid<bool>) -> (u32, (usize, usize)) {
     let mut max_node = (0, 0);
     let w = grid.width as i32;
     let h = grid.height as i32;
-    for y in 0..grid.height {
-        for x in 0..grid.width {
-            let mut counter = 0;
-            if grid.get(x, y) == Some(&false) {
-                continue;
-            }
-            for dx in -(x as i32)..=w {
-                for dy in -(y as i32)..=h {
-                    let gcd = gcd_2(dx, dy);
-                    if gcd == 1 {
-                        match ray(&grid, (x, y), (dx, dy)) {
-                            Some(_) => {
-                                counter += 1
-                            }
-                            None => {}
-                        }
+
+    let asteroids = grid
+        .to_vec()
+        .into_iter()
+        .enumerate()
+        .flat_map(|(y, line)| {
+            line.iter()
+                .enumerate()
+                .filter_map(move |(x, c)| if *c { Some((x as i32, y as i32)) } else { None })
+                .collect::<Vec<_>>()
+        })
+        .collect::<Vec<_>>();
+
+    for (x, y) in &asteroids {
+        let mut counter = 0;
+
+        for (tx, ty) in &asteroids {
+            let dx = tx - *x;
+            let dy = ty - *y;
+            let gcd = gcd_2(dx, dy);
+            if gcd > 0 {
+                let dx = dx / gcd;
+                let dy = dy / gcd;
+                if let Some(c) = ray(&grid, (*x as usize, *y as usize), (dx, dy)) {
+                    if c == (*tx as usize, *ty as usize) {
+                        counter += 1;
                     }
                 }
             }
+        }
 
-            if counter > max_counter {
-                max_counter = counter;
-                max_node = (x, y);
-            }
+        if counter > max_counter {
+            max_counter = counter;
+            max_node = (*x as usize, *y as usize);
         }
     }
     (max_counter, max_node)
 }
 
-fn exercise_2(mut grid: Grid<bool>, x: i32, y: i32) -> usize {
+fn exercise_2(grid: Grid<bool>, x: i32, y: i32) -> usize {
     // collect asteroids and their degrees
     let mut asteroids = grid
         .to_vec()
@@ -139,7 +149,7 @@ fn ray(grid: &Grid<bool>, pos: (usize, usize), dir: (i32, i32)) -> Option<(usize
     x += dir.0;
     y += dir.1;
 
-    while x >= 0 && x < w && y >= 0 && y < h {        
+    while x >= 0 && x < w && y >= 0 && y < h {
         if grid.get(x as usize, y as usize) == Some(&true) {
             return Some((x as usize, y as usize));
         }

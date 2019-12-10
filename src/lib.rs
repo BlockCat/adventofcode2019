@@ -124,8 +124,8 @@ where
     T: Clone + PartialEq + Eq + Default,
 {
     grid: Vec<T>,
-    width: usize,
-    height: usize,
+    pub width: usize,
+    pub height: usize,
 }
 
 impl<T> Grid<T>
@@ -138,6 +138,20 @@ where
             width,
             height,
         }
+    }
+
+    pub fn from_vec(grid: Vec<Vec<T>>) -> Grid<T> {
+        let width = grid[0].len();
+        let height = grid.len();
+        Grid {
+            grid: grid.into_iter().flatten().collect(),
+            width,
+            height,
+        }
+    }
+
+    pub fn to_vec(&self) -> Vec<Vec<T>> {
+        self.grid.chunks(self.width).map(|x| Vec::from(x)).collect()
     }
 
     pub fn set(&mut self, x: usize, y: usize, value: T) {

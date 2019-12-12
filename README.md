@@ -72,3 +72,8 @@ test day_11::d11_bench_ex1   ... FAILED
 test day_11::d11_bench_ex2   ... FAILED
 test day_11::d11_bench_parse ... bench:      16,795 ns/iter (+/- 1,667)
 ```
+Day 12
+```rust
+test day_12::d11_bench_ex1 ... bench:     110,895 ns/iter (+/- 32,517)
+test day_12::d11_bench_ex2 ... bench: 325,004,960 ns/iter (+/- 32,433,991)
+```

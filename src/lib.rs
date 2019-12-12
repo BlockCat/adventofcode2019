@@ -7,6 +7,8 @@ use std::ops::SubAssign;
 #[derive(PartialEq, Eq, Clone, Copy, Hash)]
 pub struct Vector2(pub isize, pub isize);
 
+
+
 impl Vector2 {
     pub fn length_sq(&self) -> isize {
         self.0 * self.0 + self.1 * self.1
@@ -82,6 +84,47 @@ impl SubAssign<Direction> for Vector2 {
             }
     }
 }
+
+#[derive(PartialEq, Eq, Clone, Copy, Hash, Debug)]
+pub struct Vector3(pub isize, pub isize, pub isize);
+
+impl Vector3 {
+    pub fn sign(self) -> Vector3 {
+        Vector3(self.0.signum(), self.1.signum(), self.2.signum())
+    }
+
+    pub fn manhattan(lhs: &Self, other: &Self) -> usize {
+        ((lhs.0 - other.0).abs() + (lhs.1 - other.1).abs() + (lhs.2 - other.2).abs()) as usize
+    }
+
+    pub fn length_sq(&self) -> usize {
+        (self.0.abs() + self.1.abs() + self.2.abs()) as usize
+    }
+}
+
+impl Add for Vector3 {
+    type Output = Self;
+
+    fn add(self, other: Self) -> Self {
+        Vector3(self.0 + other.0, self.1 + other.1, self.2 + other.2)
+    }
+}
+
+impl AddAssign for Vector3 {    
+
+    fn add_assign(&mut self, other: Self) {
+        *self = *self + other;
+    }
+}
+
+impl Sub for Vector3 {
+    type Output = Self;
+
+    fn sub(self, other: Self) -> Self {
+        Vector3(self.0 - other.0, self.1 - other.1, self.2 - other.2)
+    }
+}
+
 
 #[derive(PartialEq, Eq, Clone, Copy)]
 pub enum Direction {

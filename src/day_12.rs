@@ -79,7 +79,8 @@ fn exercise_2(mut input: Vec<Planet>) -> u128 {
                 input[j].vel += ij;
                 input[i].vel += ji;
             }
-        }
+       }
+
         for p in input.iter_mut() {
             p.pos += p.vel;
 
@@ -88,7 +89,7 @@ fn exercise_2(mut input: Vec<Planet>) -> u128 {
             vec_collec[2][p.id] = (p.pos.2, p.vel.2);
         }
 
-        if xc == None {            
+        if xc == None {
             if let Some(x_cycle) = sets[0].insert(vec_collec[0].clone(), step) {
                 println!("x_c: {} starting at {}", step - x_cycle, x_cycle);
                 xc = Some((step - x_cycle, x_cycle));

@@ -68,12 +68,18 @@ test day_10::d10_bench_parse ... bench:      17,616 ns/iter (+/- 314)
 ```
 Day 11
 ```rust
-test day_11::d11_bench_ex1   ... FAILED
-test day_11::d11_bench_ex2   ... FAILED
-test day_11::d11_bench_parse ... bench:      16,795 ns/iter (+/- 1,667)
+test day_11::d11_bench_ex1   ... bench:  15,047,340 ns/iter (+/- 1,558,203)
+test day_11::d11_bench_ex2   ... bench:     411,673 ns/iter (+/- 41,513)
+test day_11::d11_bench_parse ... bench:      17,433 ns/iter (+/- 1,612)
 ```
 Day 12
 ```rust
 test day_12::d11_bench_ex1 ... bench:     110,895 ns/iter (+/- 32,517)
 test day_12::d11_bench_ex2 ... bench: 325,004,960 ns/iter (+/- 32,433,991)
+```
+Day 13
+```rust
+test day_13::d13_bench_ex1   ... bench:     438,557 ns/iter (+/- 12,711)
+test day_13::d13_bench_ex2   ... bench:  16,674,450 ns/iter (+/- 993,883)
+test day_13::d13_bench_parse ... bench:      51,499 ns/iter (+/- 516)
 ```

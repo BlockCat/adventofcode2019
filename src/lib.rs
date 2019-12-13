@@ -7,8 +7,6 @@ use std::ops::SubAssign;
 #[derive(PartialEq, Eq, Clone, Copy, Hash)]
 pub struct Vector2(pub isize, pub isize);
 
-
-
 impl Vector2 {
     pub fn length_sq(&self) -> isize {
         self.0 * self.0 + self.1 * self.1
@@ -110,8 +108,7 @@ impl Add for Vector3 {
     }
 }
 
-impl AddAssign for Vector3 {    
-
+impl AddAssign for Vector3 {
     fn add_assign(&mut self, other: Self) {
         *self = *self + other;
     }
@@ -124,7 +121,6 @@ impl Sub for Vector3 {
         Vector3(self.0 - other.0, self.1 - other.1, self.2 - other.2)
     }
 }
-
 
 #[derive(PartialEq, Eq, Clone, Copy)]
 pub enum Direction {
@@ -208,4 +204,214 @@ where
     pub fn get_mut(&mut self, x: usize, y: usize) -> Option<&mut T> {
         self.grid.get_mut(x + y * self.width)
     }
+}
+
+pub mod intcode {
+
+    #[derive(PartialEq, Eq, Debug)]
+    enum ParamMode {
+        Position,
+        Immediate,
+        Relative,
+    }
+    impl From<i32> for ParamMode {
+        fn from(mode: i32) -> Self {
+            match mode {
+                0 => ParamMode::Position,
+                1 => ParamMode::Immediate,
+                2 => ParamMode::Relative,
+                _ => unreachable!(),
+            }
+        }
+    }
+    impl From<i64> for ParamMode {
+        fn from(mode: i64) -> Self {
+            match mode {
+                0 => ParamMode::Position,
+                1 => ParamMode::Immediate,
+                2 => ParamMode::Relative,
+                _ => unreachable!(),
+            }
+        }
+    }
+
+    #[derive(Clone)]
+    pub struct Memory {
+        input: Vec<i64>,
+        overmem: hashbrown::HashMap<usize, i64>,
+    }
+
+    impl std::ops::Index<usize> for Memory {
+        type Output = i64;
+        fn index(&self, index: usize) -> &Self::Output {
+            if index < self.input.len() {
+                &self.input[index]
+            } else {
+                self.overmem.get(&index).unwrap_or(&0)
+            }
+        }
+    }
+
+    impl std::ops::IndexMut<usize> for Memory {
+        fn index_mut<'a>(&'a mut self, index: usize) -> &'a mut Self::Output {
+            if index < self.input.len() {
+                &mut self.input[index]
+            } else {
+                self.overmem.entry(index).or_insert(0)
+            }
+        }
+    }
+
+    #[derive(Clone)]
+    pub struct IntProgram {
+        pub memory: Memory,
+        pc: usize,
+        relative_position: isize,
+        input_stack: Vec<i64>,
+    }
+
+    impl IntProgram {
+        pub fn parse(opcodes: &str) -> IntProgram {
+            let memory = Memory {
+                overmem: hashbrown::HashMap::new(),
+                input: opcodes
+                    .split(',')
+                    .map(|x| x.parse::<i64>().unwrap())
+                    .collect(),
+            };
+
+            IntProgram {
+                memory,
+                pc: 0,
+                relative_position: 0,
+                input_stack: vec![],
+            }
+        }
+
+        pub fn input(&mut self, input: i64) {
+            self.input_stack.push(input);
+        }
+
+        fn get_index(&self, mode: ParamMode, i: usize) -> usize {
+            match mode {
+                ParamMode::Position => self.memory[i] as usize,
+                ParamMode::Immediate => self.memory[i] as usize,
+                ParamMode::Relative => (self.memory[i] as isize + self.relative_position) as usize,
+            }
+        }
+
+        fn get_value(&self, mode: ParamMode, i: usize) -> i64 {
+            match mode {
+                ParamMode::Immediate => self.memory[i],
+                ParamMode::Position => self.memory[self.memory[i] as usize],
+                ParamMode::Relative => {
+                    self.memory[(self.memory[i] as isize + self.relative_position) as usize]
+                }
+            }
+        }
+    }
+
+    impl Iterator for IntProgram {
+        type Item = i64;
+
+        fn next(&mut self) -> Option<Self::Item> {
+            loop {
+                let instruction = self.memory[self.pc];
+                let opcode = instruction % 100;
+                let mode_1 = ParamMode::from((instruction / 100) % 10);
+                let mode_2 = ParamMode::from((instruction / 1_000) % 10);
+                let mode_3 = ParamMode::from((instruction / 10_000) % 10);
+                //println!("{} - {:?}", opcode, self.memory);
+                match opcode {
+                    1 => {
+                        // add
+                        let a = self.get_value(mode_1, self.pc + 1);
+                        let b = self.get_value(mode_2, self.pc + 2);
+                        let index = self.get_index(mode_3, self.pc + 3);
+                        self.memory[index as usize] = a + b;
+                        self.pc += 4;
+                    }
+                    2 => {
+                        // mul
+                        let a = self.get_value(mode_1, self.pc + 1);
+                        let b = self.get_value(mode_2, self.pc + 2);
+                        let index = self.get_index(mode_3, self.pc + 3);
+                        self.memory[index as usize] = a * b;
+                        self.pc += 4;
+                    }
+                    3 => {
+                        // input
+                        let index = self.get_index(mode_1, self.pc + 1);
+                        self.memory[index as usize] = self.input_stack.pop().expect("Could not get input");
+                        self.pc += 2;
+                    }
+                    4 => {
+                        // output
+                        let value = self.get_value(mode_1, self.pc + 1);
+                        self.pc += 2;
+                        return Some(value);
+                    }
+                    5 => {
+                        // jump not 0
+                        let tester = self.get_value(mode_1, self.pc + 1);
+                        let jumper = self.get_value(mode_2, self.pc + 2);
+                        if tester != 0 {
+                            self.pc = jumper as usize;
+                        } else {
+                            self.pc += 3;
+                        }
+                    }
+                    6 => {
+                        // jump if 0
+                        let tester = self.get_value(mode_1, self.pc + 1);
+                        let jumper = self.get_value(mode_2, self.pc + 2);
+                        if tester == 0 {
+                            self.pc = jumper as usize;
+                        } else {
+                            self.pc += 3;
+                        }
+                    }
+                    7 => {
+                        // a < b
+                        let a = self.get_value(mode_1, self.pc + 1);
+                        let b = self.get_value(mode_2, self.pc + 2);
+                        let index = self.get_index(mode_3, self.pc + 3);
+                        if a < b {
+                            self.memory[index as usize] = 1;
+                        } else {
+                            self.memory[index as usize] = 0;
+                        }
+                        self.pc += 4;
+                    }
+                    8 => {
+                        // a == b
+                        let a = self.get_value(mode_1, self.pc + 1);
+                        let b = self.get_value(mode_2, self.pc + 2);
+                        let index = self.get_index(mode_3, self.pc + 3);
+                        if a == b {
+                            self.memory[index as usize] = 1;
+                        } else {
+                            self.memory[index as usize] = 0;
+                        }
+                        self.pc += 4;
+                    }
+                    9 => {
+                        let a = self.get_value(mode_1, self.pc + 1);
+                        self.relative_position += a as isize;
+                        self.pc += 2;
+                    }
+                    99 => return None,
+                    _ => panic!("Unexpected opcode: {}", opcode),
+                }
+            }
+        }
+    }
+    /*
+    fn self.get_value(mode: ParamMode, mem: &Memory, relative_position: i64, i: usize) -> i64 {
+        match mode {
+            ParamMode::Immediate => mem[i],
+            ParamMode::Position => mem[mem[i] as usize],
+            ParamMode::Relative => mem[(mem[i] + relative_position) as usize],
+        }
+    }*/
 }

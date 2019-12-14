@@ -1,7 +1,6 @@
 use crate::test::Bencher;
 
 use hashbrown::HashMap;
-use std::collections::VecDeque;
 
 #[derive(Clone, Debug)]
 struct Reaction {
@@ -21,106 +20,41 @@ type Reactions = HashMap<String, Reaction>;
 #[test]
 pub fn run() {
     let input = read_input(include_str!("input/day14.txt")); // 1239890 too high
-    println!("ex1: {}", exercise_1(&input, 1));
+    println!("ex1: {}", exercise_1_2(&input.0, &input.1, 1));
     println!("ex2: {}", exercise_2(&input));
 }
 
-fn exercise_1(reactions: &Reactions, target: u64) -> u64 {
-    let mut total_remaining = HashMap::new();
-    // Collect phase
-    let mut stack = Vec::with_capacity(reactions.len() * 10);
-    stack.push((target, String::from("FUEL")));
-    while let Some((amount_needed, output)) = stack.pop() {
-        if &output == "ORE" {
-            continue;
-        }
+const TOPOLOGY_PROCESSED: u8 = 1;
+const TOPOLOGY_IN_STACK: u8 = 2;
 
-        let reaction = &reactions[&output];
-        let inputs = &reaction.input; // inputs needed to create output
+fn exercise_1_2(reactions: &Reactions, list: &Vec<String>, target: u64) -> u64 {
+    let mut mmap = HashMap::new();
+    // Handle the fuel first
+    mmap.insert(String::from("FUEL"), target);
+    for i in list {
+        let reaction = &reactions[i]; // The reaction to create the current chemical
+        let amount_needed = mmap[i]; // Amount needed to create all the current chemicals
 
-        let remaining_chemicals = amount_needed % reaction.output_num;
+        let remaining_chemicals = amount_needed % reaction.output_num; // Chemicals remaining after reactions
         let reactions_needed =
-            (amount_needed / reaction.output_num) + (remaining_chemicals > 0) as u64;
+            (amount_needed / reaction.output_num) + (remaining_chemicals > 0) as u64; // Reactions needed to create required amount and remaining chemicals
 
-        *total_remaining.entry(output.clone()).or_insert(0) +=
-            reactions_needed * reaction.output_num;
-
-        for chm in inputs {
-            stack.push((chm.0 * reactions_needed, chm.1.clone()));
+        for (amount, child_chemical) in &reaction.input {
+            *mmap.entry(child_chemical.clone()).or_insert(0) += reactions_needed * amount;
+            // Add needed chemicals?
         }
     }
-
-    // Remove phase
-    let mut stack = Vec::with_capacity(reactions.len() * 10);
-    stack.push((target, String::from("FUEL")));
-    let mut sum = 0;
-
-    while let Some((amount_needed, output)) = stack.pop() {
-        if &output == "ORE" {
-            sum += amount_needed;
-            continue;
-        }
-
-        let reaction = &reactions[&output];
-        let inputs = &reaction.input; // inputs needed to create output
-
-        let amount_needed = {
-            let remaining = total_remaining.get_mut(&output).unwrap();
-            let taken = std::cmp::min(*remaining, amount_needed);
-            *remaining -= taken;
-            amount_needed
-        };
-        let remaining_chemicals = amount_needed % reaction.output_num;
-        let reactions_needed =
-            (amount_needed / reaction.output_num) + (remaining_chemicals > 0) as u64;
-
-        for chm in inputs {
-            stack.push((chm.0 * reactions_needed, chm.1.clone()));
-        }
-    }
-
-    let mut removal = 0;
-    for i in 0.. {
-        let stack = total_remaining
-            .iter()
-            .filter_map(|(key, value)| {
-                if *value > 0 && *value / &reactions[key].output_num > 0 {
-                    Some((*value, key.clone()))
-                } else {
-                    None
-                }
-            })
-            .collect::<Vec<_>>();
-
-        if stack.len() == 0 {
-            break;
-        }
-        for (needed, chemical) in &stack {
-            let reaction = &reactions[chemical];
-            let reactions_needed = needed / reaction.output_num;
-            *total_remaining.get_mut(chemical).unwrap() -= reactions_needed * reaction.output_num;
-            if reaction.is_ore() {
-                removal += &reaction.input[0].0 * (needed / reaction.output_num);
-            } else {
-                for (amount, input) in &reaction.input {
-                    *total_remaining.get_mut(input).unwrap() += amount * reactions_needed;
-                }
-            }
-        }
-    }
-
-    sum - removal
+    mmap["ORE"]
 }
 
-fn exercise_2(reactions: &Reactions) -> u64 {
+fn exercise_2((reactions, list): &(Reactions, Vec<String>)) -> u64 {
     // Is this a max flow or something?
     let search: u64 = 1_000_000_000_000;
 
     // increase
     let mut it = 1;
-    while exercise_1(&reactions, it) < search {
+    while exercise_1_2(&reactions, &list, it) < search {
         it *= 2;
-        
     }
     // it's between [it / 2; it) inclusive
 
@@ -129,11 +63,10 @@ fn exercise_2(reactions: &Reactions) -> u64 {
     let mut mid = (down + up) / 2;
 
     loop {
-             
         if mid == down {
             return mid;
         }
-        let result = exercise_1(&reactions, mid);        
+        let result = exercise_1_2(&reactions, &list, mid);
 
         if result < search {
             down = mid;
@@ -144,12 +77,51 @@ fn exercise_2(reactions: &Reactions) -> u64 {
     }
 }
 
-fn read_input(input: &str) -> Reactions {
-    input
+fn read_input(input: &str) -> (Reactions, Vec<String>) {    
+    enum Status {
+        Visisted(String),
+        Unvisited(String),
+    }
+    
+    let reactions = input
         .lines()
         .map(read_line)
         .map(|x| (x.output.clone(), x))
-        .collect()
+        .collect::<HashMap<_, _>>();
+
+    let mut stack = Vec::new();
+    stack.push(Status::Unvisited("FUEL".to_string()));
+
+    let mut node_state: HashMap<String, u8> =
+        reactions.iter().map(|x| (x.0.clone(), 0u8)).collect();
+    node_state.insert("ORE".to_string(), 0);
+
+    let mut list = Vec::new();
+
+    while let Some(current_node) = stack.pop() {
+        match current_node {
+            Status::Unvisited(current_node) => {
+                if node_state[&current_node] == 0 {
+                    *node_state.entry(current_node.clone()).or_insert(0) |= TOPOLOGY_IN_STACK;
+                    if let Some(predecessors) = reactions.get(&current_node).map(|x| &x.input) {
+                        stack.reserve(predecessors.len() + 1);
+                        stack.push(Status::Visisted(current_node));
+                        stack.extend(predecessors.iter().map(|x| Status::Unvisited(x.1.clone())));
+                    }
+                }
+            }
+            Status::Visisted(current_node) => {
+                if node_state[&current_node[..]] & TOPOLOGY_PROCESSED == 0 {
+                    node_state.insert(current_node.clone(), TOPOLOGY_PROCESSED);
+                    list.push(current_node);
+                }
+            }
+        }
+    }
+
+    list.reverse();
+
+    (reactions, list)
 }
 
 fn read_line(line: &str) -> Reaction {
@@ -253,23 +225,25 @@ fn d14_test() {
         2210736,
         460664,
     );
+
+    mini_test_2(include_str!("input/day14.txt"), 1185296, 1376631)
 }
 
 fn mini_test(input: &str, expected: u64) {
     let input = read_input(input);
-    assert_eq!(exercise_1(&input, 1), expected);
+    assert_eq!(exercise_1_2(&input.0, &input.1, 1), expected);
 }
 
 fn mini_test_2(input: &str, expected: u64, expected_2: u64) {
     let input = read_input(input);
-    assert_eq!(exercise_1(&input, 1), expected);
+    assert_eq!(exercise_1_2(&input.0, &input.1, 1), expected);
     assert_eq!(exercise_2(&input), expected_2);
 }
 
 #[bench]
 fn d14_bench_ex1(b: &mut Bencher) {
     let input = read_input(include_str!("input/day14.txt"));
-    b.iter(|| exercise_1(&input, 1));
+    b.iter(|| exercise_1_2(&input.0, &input.1, 1));
 }
 
 #[bench]

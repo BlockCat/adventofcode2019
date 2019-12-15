@@ -20,28 +20,26 @@ type Reactions = HashMap<String, Reaction>;
 #[test]
 pub fn run() {
     let input = read_input(include_str!("input/day14.txt")); // 1239890 too high
-    println!("ex1: {}", exercise_1_2(&input.0, &input.1, 1));
+    println!("ex1: {}", exercise_1(&input.0, &input.1, 1));
     println!("ex2: {}", exercise_2(&input));
 }
 
 const TOPOLOGY_PROCESSED: u8 = 1;
 const TOPOLOGY_IN_STACK: u8 = 2;
 
-fn exercise_1_2(reactions: &Reactions, list: &Vec<String>, target: u64) -> u64 {
+fn exercise_1(reactions: &Reactions, list: &Vec<String>, target: u64) -> u64 {
     let mut mmap = HashMap::new();
-    // Handle the fuel first
     mmap.insert(String::from("FUEL"), target);
     for i in list {
         let reaction = &reactions[i]; // The reaction to create the current chemical
-        let amount_needed = mmap[i]; // Amount needed to create all the current chemicals
+        let amount_needed = mmap[i]; // Amount of chemicals that need to be created
 
         let remaining_chemicals = amount_needed % reaction.output_num; // Chemicals remaining after reactions
         let reactions_needed =
             (amount_needed / reaction.output_num) + (remaining_chemicals > 0) as u64; // Reactions needed to create required amount and remaining chemicals
 
         for (amount, child_chemical) in &reaction.input {
-            *mmap.entry(child_chemical.clone()).or_insert(0) += reactions_needed * amount;
-            // Add needed chemicals?
+            *mmap.entry(child_chemical.clone()).or_insert(0) += reactions_needed * amount;            
         }
     }
     mmap["ORE"]
@@ -53,7 +51,7 @@ fn exercise_2((reactions, list): &(Reactions, Vec<String>)) -> u64 {
 
     // increase
     let mut it = 1;
-    while exercise_1_2(&reactions, &list, it) < search {
+    while exercise_1(&reactions, &list, it) < search {
         it *= 2;
     }
     // it's between [it / 2; it) inclusive
@@ -66,7 +64,7 @@ fn exercise_2((reactions, list): &(Reactions, Vec<String>)) -> u64 {
         if mid == down {
             return mid;
         }
-        let result = exercise_1_2(&reactions, &list, mid);
+        let result = exercise_1(&reactions, &list, mid);
 
         if result < search {
             down = mid;
@@ -82,7 +80,7 @@ fn read_input(input: &str) -> (Reactions, Vec<String>) {
         Visisted(String),
         Unvisited(String),
     }
-    
+
     let reactions = input
         .lines()
         .map(read_line)
@@ -231,12 +229,12 @@ fn d14_test() {
 
 fn mini_test(input: &str, expected: u64) {
     let input = read_input(input);
-    assert_eq!(exercise_1_2(&input.0, &input.1, 1), expected);
+    assert_eq!(exercise_1(&input.0, &input.1, 1), expected);
 }
 
 fn mini_test_2(input: &str, expected: u64, expected_2: u64) {
     let input = read_input(input);
-    assert_eq!(exercise_1_2(&input.0, &input.1, 1), expected);
+    assert_eq!(exercise_1(&input.0, &input.1, 1), expected);
     assert_eq!(exercise_2(&input), expected_2);
 }
 

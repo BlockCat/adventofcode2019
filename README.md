@@ -68,9 +68,9 @@ test day_10::d10_bench_parse ... bench:      17,616 ns/iter (+/- 314)
 ```
 Day 11
 ```rust
-test day_11::d11_bench_ex1   ... bench:   1,923,555 ns/iter (+/- 348,748)
-test day_11::d11_bench_ex2   ... bench:     195,525 ns/iter (+/- 32,629)
-test day_11::d11_bench_parse ... bench:      17,979 ns/iter (+/- 1,139)   
+test day_11::d11_bench_ex1   ... bench:   1,987,850 ns/iter (+/- 85,495)
+test day_11::d11_bench_ex2   ... bench:     197,357 ns/iter (+/- 8,348)
+test day_11::d11_bench_parse ... bench:      18,809 ns/iter (+/- 954)
 ```
 Day 12
 ```rust

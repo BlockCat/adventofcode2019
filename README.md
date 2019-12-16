@@ -95,3 +95,9 @@ test day_15::d15_bench_ex1   ... bench:   1,581,410 ns/iter (+/- 927,883)
 test day_15::d15_bench_ex2   ... bench:   1,620,450 ns/iter (+/- 95,106)
 test day_15::d15_bench_parse ... bench:      25,475 ns/iter (+/- 4,320)
 ```
+Day 16
+```rust
+test day_16::d16_bench_ex1   ... bench:  55,175,020 ns/iter (+/- 450,363)
+test day_16::d16_bench_ex2   ... bench: 153,938,680 ns/iter (+/- 1,939,986)
+test day_16::d16_bench_parse ... bench:         782 ns/iter (+/- 124)
+```

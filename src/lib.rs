@@ -4,7 +4,7 @@ use std::ops::AddAssign;
 use std::ops::Sub;
 use std::ops::SubAssign;
 
-#[derive(PartialEq, Eq, Clone, Copy, Hash)]
+#[derive(PartialEq, Eq, Clone, Copy, Hash, Debug)]
 pub struct Vector2(pub isize, pub isize);
 
 impl Vector2 {
@@ -122,7 +122,7 @@ impl Sub for Vector3 {
     }
 }
 
-#[derive(PartialEq, Eq, Clone, Copy)]
+#[derive(PartialEq, Eq, Clone, Copy, Debug)]
 pub enum Direction {
     North,
     East,
@@ -219,6 +219,7 @@ where
 }
 
 pub mod intcode {
+    use std::collections::VecDeque;
 
     #[derive(PartialEq, Eq, Debug)]
     enum ParamMode {
@@ -279,7 +280,7 @@ pub mod intcode {
         pub memory: Memory,
         pc: usize,
         relative_position: isize,
-        input_stack: Vec<i64>,
+        input_stack: VecDeque<i64>,
     }
 
     impl IntProgram {
@@ -296,12 +297,13 @@ pub mod intcode {
                 memory,
                 pc: 0,
                 relative_position: 0,
-                input_stack: vec![],
+                input_stack: VecDeque::new()
             }
         }
 
         pub fn input(&mut self, input: i64) {
-            self.input_stack.push(input);
+            //println!(">{}", (input as u8) as char);
+            self.input_stack.push_back(input);
         }
 
         fn get_index(&self, mode: ParamMode, i: usize) -> usize {
@@ -353,8 +355,8 @@ pub mod intcode {
                     }
                     3 => {
                         // input
-                        let index = self.get_index(mode_1, self.pc + 1);
-                        self.memory[index as usize] = self.input_stack.pop().expect("Could not get input");
+                        let index = self.get_index(mode_1, self.pc + 1);                        
+                        self.memory[index as usize] = self.input_stack.pop_front().expect("Could not get input");
                         self.pc += 2;
                     }
                     4 => {

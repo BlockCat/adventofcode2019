@@ -4,7 +4,7 @@ use std::ops::AddAssign;
 use std::ops::Sub;
 use std::ops::SubAssign;
 
-#[derive(PartialEq, Eq, Clone, Copy, Hash, Debug)]
+#[derive(PartialEq, Eq, Clone, Copy, Hash, Debug, Ord, PartialOrd)]
 pub struct Vector2(pub isize, pub isize);
 
 impl Vector2 {
@@ -174,7 +174,7 @@ pub struct Grid<T>
 where
     T: Clone + PartialEq + Eq + Default,
 {
-    grid: Vec<T>,
+    pub grid: Vec<T>,
     pub width: usize,
     pub height: usize,
 }
@@ -209,12 +209,32 @@ where
         self.grid[x + y * self.width] = value;
     }
 
+    pub fn set_vec(&mut self, pos: &Vector2, value: T) {
+        self.set(pos.0 as usize, pos.1 as usize, value);
+    }
+
+    pub fn get_vec(&self, pos: &Vector2) -> Option<&T> {
+        self.get(pos.0 as usize, pos.1 as usize)
+    }
+
     pub fn get(&self, x: usize, y: usize) -> Option<&T> {
-        self.grid.get(x + y * self.width)
+        if x < self.width && y < self.height {
+            self.grid.get(x + y * self.width)
+        } else {
+            None
+        }
     }
 
     pub fn get_mut(&mut self, x: usize, y: usize) -> Option<&mut T> {
         self.grid.get_mut(x + y * self.width)
+    }
+
+    pub fn print(&self) {
+        for y in 0..self.height {
+            for x in 0..self.width {
+
+            }
+        }
     }
 }
 

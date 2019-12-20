@@ -107,3 +107,21 @@ test day_17::d17_bench_ex1   ... bench:     837,455 ns/iter (+/- 145,270)
 test day_17::d17_bench_ex2   ... bench:   2,476,110 ns/iter (+/- 34,509)
 test day_17::d17_bench_parse ... bench:      38,472 ns/iter (+/- 956)
 ```
+Day 18
+```rust
+test day_18::d18_bench_ex1   ... bench: 701,512,250 ns/iter (+/- 40,475,613)
+test day_18::d18_bench_ex2   ... bench: 533,996,630 ns/iter (+/- 19,716,109)
+test day_18::d18_bench_parse ... bench:      71,548 ns/iter (+/- 10,983)
+```
+Day 19 :-1:
+```rust
+test day_19::d19_bench_ex1   ... bench:  23,425,160 ns/iter (+/- 986,491)
+test day_19::d19_bench_ex2   ... bench:  42,151,700 ns/iter (+/- 2,062,310)
+test day_19::d19_bench_parse ... bench:      12,352 ns/iter (+/- 141)
+```
+Day 20
+```rust
+test day_20::d20_bench_ex1   ... bench:     420,055 ns/iter (+/- 13,822)
+test day_20::d20_bench_ex2   ... bench:  26,076,300 ns/iter (+/- 1,481,690)
+test day_20::d20_bench_parse ... bench:     234,447 ns/iter (+/- 14,909)
+```

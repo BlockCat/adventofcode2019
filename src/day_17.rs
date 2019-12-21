@@ -206,29 +206,6 @@ fn exercise_2(mut program: intcode::IntProgram) -> usize {
 }
 
 fn provide_array(program: &mut intcode::IntProgram, array: &str) {
-    /*let array = array.split(',').collect::<Vec<_>>();
-    assert!(array.len() <= 20);
-    for i in 0..(array.len() - 1) {
-        let x = array[i].trim();
-        if let Ok(n) = x.parse::<i64>() {
-            print!("{},", n);
-            program.input(n);
-        } else {
-            let n = x.chars().next().unwrap();
-            print!("{},", n);
-            program.input(n as i64);
-        }
-        program.input(',' as i64);
-    }
-    let last = array.last().unwrap().trim();
-    if let Ok(n) = last.parse::<i64>() {
-        print!("{},", n);
-        program.input(n);
-    } else {
-        let n = last.chars().next().unwrap();
-        print!("{},", n);
-        program.input(n as i64);
-    }*/
     for c in array.chars() {
         program.input(c as i64);
     }

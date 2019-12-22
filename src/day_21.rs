@@ -18,10 +18,7 @@ fn exercise_1(mut program: intcode::IntProgram) -> Option<i64> {
     let last_value = output.last().unwrap();
 
     if *last_value <= 128 {
-        println!(
-            "{}",
-            output.iter().map(|x| *x as u8 as char).collect::<String>()
-        );
+        print_error(output);
         None
     } else {
         Some(*last_value)
@@ -41,14 +38,18 @@ fn exercise_2(mut program: intcode::IntProgram) -> Option<i64> {
     let last_value = output.last().unwrap();
 
     if *last_value <= 128 {
-        println!(
-            "{}",
-            output.iter().map(|x| *x as u8 as char).collect::<String>()
-        );
-        None
+       print_error(output);
+       None
     } else {
         Some(*last_value)
     }
+}
+
+fn print_error(output: Vec<i64>) {
+    println!(
+        "{}",
+        output.iter().map(|x| *x as u8 as char).collect::<String>()
+    );
 }
 
 fn provide_array(program: &mut intcode::IntProgram, array: &str) {

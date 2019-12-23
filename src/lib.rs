@@ -137,7 +137,7 @@ impl From<usize> for Direction {
             1 => Direction::South,
             2 => Direction::West,
             3 => Direction::East,
-            _ => panic!()
+            _ => panic!(),
         }
     }
 }
@@ -231,9 +231,7 @@ where
 
     pub fn print(&self) {
         for y in 0..self.height {
-            for x in 0..self.width {
-
-            }
+            for x in 0..self.width {}
         }
     }
 }
@@ -295,12 +293,18 @@ pub mod intcode {
         }
     }
 
+    #[derive(Debug, PartialEq, Eq)]
+    pub enum IntProgramResult {
+        Value(i64), Stalled
+    }
+
     #[derive(Clone)]
     pub struct IntProgram {
         pub memory: Memory,
         pc: usize,
         relative_position: isize,
-        input_stack: VecDeque<i64>,
+        pub input_stack: VecDeque<i64>,
+        default_input: Option<i64>,
     }
 
     impl IntProgram {
@@ -317,13 +321,24 @@ pub mod intcode {
                 memory,
                 pc: 0,
                 relative_position: 0,
-                input_stack: VecDeque::new()
+                input_stack: VecDeque::new(),
+                default_input: None,
             }
         }
 
         pub fn input(&mut self, input: i64) {
-            //println!(">{}", (input as u8) as char);
             self.input_stack.push_back(input);
+        }
+
+        pub fn has_input(&self) -> bool {
+            self.input_stack.len() > 0
+        }
+
+        pub fn remove_default_input(&mut self) {
+            self.default_input = None;
+        }
+        pub fn default_input(&mut self, input: i64) {
+            self.default_input = Some(input);
         }
 
         fn get_index(&self, mode: ParamMode, i: usize) -> usize {
@@ -346,7 +361,7 @@ pub mod intcode {
     }
 
     impl Iterator for IntProgram {
-        type Item = i64;
+        type Item = IntProgramResult;
 
         fn next(&mut self) -> Option<Self::Item> {
             loop {
@@ -375,15 +390,20 @@ pub mod intcode {
                     }
                     3 => {
                         // input
-                        let index = self.get_index(mode_1, self.pc + 1);                        
-                        self.memory[index as usize] = self.input_stack.pop_front().expect("Could not get input");
+                        let index = self.get_index(mode_1, self.pc + 1);
+                        self.memory[index as usize] = if let Some(input) = self.input_stack.pop_front() {
+                            input
+                        } else {
+                            return Some(IntProgramResult::Stalled);
+                        };
+                          
                         self.pc += 2;
                     }
                     4 => {
                         // output
                         let value = self.get_value(mode_1, self.pc + 1);
                         self.pc += 2;
-                        return Some(value);
+                        return Some(IntProgramResult::Value(value));
                     }
                     5 => {
                         // jump not 0

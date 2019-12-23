@@ -5,8 +5,8 @@ extern crate utils;
 extern crate packed_simd;
 
 #[allow(dead_code)]
-mod day_22;
+mod day_23;
 
 fn main() {    
-    day_22::run();
+    day_23::run();
 }

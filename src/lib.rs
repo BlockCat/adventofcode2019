@@ -169,7 +169,7 @@ impl Direction {
     }
 }
 
-#[derive(PartialEq, Eq, Clone)]
+#[derive(PartialEq, Eq, Clone, Hash)]
 pub struct Grid<T>
 where
     T: Clone + PartialEq + Eq + Default,
@@ -229,11 +229,7 @@ where
         self.grid.get_mut(x + y * self.width)
     }
 
-    pub fn print(&self) {
-        for y in 0..self.height {
-            for x in 0..self.width {}
-        }
-    }
+    
 }
 
 pub mod intcode {

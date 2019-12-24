@@ -41,9 +41,8 @@ impl Iterator for WireInstruction {
         Some(self.position)
     }
 }
-
 pub fn run() {
-    let mut input = read_input(include_str!("input/day3_big.txt"));
+    let mut input = read_input(include_str!("input/day3.txt"));
     println!("{}", exercise_1(input.clone()));
     println!("{}", exercise_2(input.clone()));
 }

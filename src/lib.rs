@@ -3,6 +3,7 @@ use std::ops::Add;
 use std::ops::AddAssign;
 use std::ops::Sub;
 use std::ops::SubAssign;
+use std::ops::Mul;
 
 #[derive(PartialEq, Eq, Clone, Copy, Hash)]
 pub struct Vector2(pub isize, pub isize);
@@ -83,6 +84,15 @@ impl SubAssign<Direction> for Vector2 {
     }
 }
 
+impl Mul<isize> for Direction {
+    type Output = Vector2;
+
+    fn mul(self, x: isize) -> Self::Output {
+        let Vector2(a, b) = self.to_vec();
+        Vector2(a * x, b * x)
+    }
+}
+
 #[derive(PartialEq, Eq, Clone, Copy)]
 pub enum Direction {
     North,
@@ -114,6 +124,14 @@ impl Direction {
             Direction::East => Direction::West,
             Direction::South => Direction::North,
             Direction::West => Direction::East,
+        }
+    }
+    pub fn to_vec(self) -> Vector2 {
+        match self {
+            Direction::North => Vector2(0, -1),
+            Direction::East => Vector2(1, 0),
+            Direction::South => Vector2(0, 1),
+            Direction::West => Vector2(-1, 0),
         }
     }
 }
